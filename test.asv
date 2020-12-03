@@ -15,14 +15,14 @@ Im = gIm;
 
 
 %%% Filtr medianowy
-medIm = medfilt2(Im, [2 2]);
+medIm = medfilt2(Im);
 Im = medIm;
 % figure;
 % imshow(Im);
 
 
 %%% Filtr Gaussa
-f = fspecial('gaussian', [3 3], 10);
+f = fspecial('gaussian', [5 5], 10);
 gaussIm = imfilter(Im, f);
 Im = gaussIm;
 % figure;
@@ -30,24 +30,14 @@ Im = gaussIm;
 % imhist(gaussIm);
 
 
-%%% Kontrast
-c = 1.26;
-contIm = Im * c;
-contIm(contIm<0) = 0;
-contIm(contIm>1) = 1;
-Im = contIm;
-% figure;
-% imshow(Im);
-
-
 %%% Gamma korekcja
-gamma = 0.45;
+gamma = 0.6;
 gammaIm = Im.^(1/gamma);
 gammaIm(gammaIm<0) = 0;
 gammaIm(gammaIm>1) = 1;
 Im = gammaIm;
-% figure;
-imshow(Im);
+% % imshow(Im);
+
 
 
 
