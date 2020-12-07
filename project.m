@@ -59,33 +59,19 @@ imshow(Im);
 viscircles(centers, radii, 'EdgeColor', 'b', 'LineWidth', 1);
 
 
-%%% Scatter of centers
-% subplot(1,2,1);
-% scatter(centers(:,1), centers(:,2), 'MarkerFaceColor', [0 0 1]);
+%%% DBSCAN filters found cirlces and finds logs
+n = size(centers, 1);
 
-[m, n] = size(centers);
+isLog = DBSCAN(centers, 125, 55);
 
-[idx, isNoise] = DBSCAN(centers, 130, 60);
+k = sum(isLog(:) == 1);
 
-% countLog = sum(isNoise==0);
-
-% arrLog = zeros(countLog, 2);
-
-% subplot(1,2,2);
-% for i=1:m
-%    if (isNoise(i) == 0)
-%       scatter(centers(i,1), centers(i,2),...
-%           'MarkerFaceColor', [0 0 1]);
-%       hold on;
-%    end
-% end
-
-arrLog = zeros(0,2);
-arrRad = zeros(0,1);
+arrLog = zeros(k,2);
+arrRad = zeros(k,1);
 index = 1;
 
-for i=1:m
-   if (isNoise(i) == 0)
+for i=1:n
+   if (isLog(i) == 1)
       arrLog(index, 1) = centers(i,1);
       arrLog(index, 2) = centers(i,2);
       arrRad(index) = radii(i);
