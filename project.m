@@ -2,7 +2,7 @@ clear; clc;
 
 
 %%% Obraz oryginalny
-origIm = double(imread('test.jpg'))/255;
+origIm = double(imread('img/1.jpg'))/255;
 Im = origIm;
 % imshow(Im);
 
@@ -31,7 +31,7 @@ Im = gaussIm;
 
 
 %%% Kontrast
-c = 1.26;
+c = 1.4;
 contIm = Im * c;
 contIm(contIm<0) = 0;
 contIm(contIm>1) = 1;
@@ -41,7 +41,7 @@ Im = contIm;
 
 
 %%% Gamma korekcja
-gamma = 0.45;
+gamma = 1.2;
 gammaIm = Im.^(1/gamma);
 gammaIm(gammaIm<0) = 0;
 gammaIm(gammaIm>1) = 1;
@@ -51,9 +51,10 @@ imshow(Im);
 
 
 %%% Hough find circles
-[centers, radii] = imfindcircles(Im, [6 20],...
-    'ObjectPolarity', 'bright', 'Method', 'TwoStage',...
-    'Sensitivity', 0.89, 'EdgeThreshold', 0.18);
+% 'ObjectPolarity', 'bright'
+[centers, radii] = imfindcircles(Im, [16 50],...
+    'Method', 'TwoStage',...
+    'Sensitivity', 0.896, 'EdgeThreshold', 0.17);
 subplot(1,2,1);
 imshow(Im);
 viscircles(centers, radii, 'EdgeColor', 'b', 'LineWidth', 1);
@@ -62,7 +63,7 @@ viscircles(centers, radii, 'EdgeColor', 'b', 'LineWidth', 1);
 %%% DBSCAN filters found cirlces and finds logs
 n = size(centers, 1);
 
-isLog = DBSCAN(centers, 125, 55);
+isLog = DBSCAN(centers, 195, 26);
 
 k = sum(isLog(:) == 1);
 
