@@ -1,0 +1,103 @@
+function processImage(origIm)
+
+%%% Obraz w odcieniach szarości
+gIm = rgb2gray(origIm);
+Im = gIm;
+
+%%% Filtr medianowy
+medIm = medfilt2(Im, [2 2]);
+Im = medIm;
+
+%%% Filtr Gaussa
+f = fspecial('gaussian', [3 3], 10);
+gaussIm = imfilter(Im, f);
+Im = gaussIm;
+
+%%% Kontrast
+c = 1.4;
+contIm = Im * c;
+contIm(contIm<0) = 0;
+contIm(contIm>1) = 1;
+Im = contIm;
+
+%%% Gamma korekcja
+gamma = 1.13;
+gammaIm = Im.^(1/gamma);
+gammaIm(gammaIm<0) = 0;
+gammaIm(gammaIm>1) = 1;
+Im = gammaIm;
+
+%%% Hough find circles
+[centers, radii] = imfindcircles(Im, [16 50],...
+    'Method', 'TwoStage',...
+    'Sensitivity', 0.885, 'EdgeThreshold', 0.17);
+
+%%% DBSCAN filters found cirlces and finds logs
+n = size(centers, 1);
+
+isLog = DBSCAN(centers, 190, 28);
+
+k = sum(isLog(:) == 1);
+
+arrLog = zeros(k,2);
+arrRad = zeros(k,1);
+index = 1;
+
+for i=1:n
+   if (isLog(i) == 1)
+      arrLog(index, 1) = centers(i,1);
+      arrLog(index, 2) = centers(i,2);
+      arrRad(index) = radii(i);
+      index = index + 1;
+   end
+end
+
+[level,E] = graythresh(gIm);
+BW = imbinarize(gIm, level);
+
+im_fill = imfill(BW, 'holes');
+
+im_fill2 = bwareaopen(im_fill, 100);
+%%%%8%%%%%
+% figure;
+% imshow(im_fill2);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+props = regionprops(im_fill2,'BoundingBox', 'Orientation', 'EulerNumber', 'Area');
+%%%9%%%%%
+% imshow(im_fill2);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+index = [];
+
+for i = 1:size(props, 1)
+    upper_left_x = props(i).BoundingBox(1);
+    upper_left_y = props(i).BoundingBox(2);
+    width = props(i).BoundingBox(3);
+    height = props(i).BoundingBox(4);     
+    ratio = width/height;
+    if  props(i).Area > 1600 && ratio <= 5 && ratio >= 3 &&  upper_left_y > 750 && props(i).Orientation > -5 && props(i).Orientation < 5 &&  props(i).EulerNumber == 1 
+        index = [index, i];
+        disp(['ratio = ', num2str(ratio)])
+        disp(['I = ', num2str(i)])
+    end
+end
+
+figure, imshow(origIm);
+hold on;
+for i = 1:size(index, 2)
+    upper_left_x = props(index(i)).BoundingBox(1); 
+    upper_left_y = props(index(i)).BoundingBox(2);
+    width = props(index(i)).BoundingBox(3); 
+    height = props(index(i)).BoundingBox(4);
+    upper_right_x = upper_left_x + width;
+    upper_right_y = upper_left_y;
+      
+    line([upper_left_x upper_right_x],[upper_left_y upper_right_y],'LineWidth', 3, 'Color','red');
+    line([upper_right_x upper_right_x],[upper_right_y upper_right_y+height],'LineWidth', 3, 'Color','red');
+    line([upper_right_x upper_left_x],[upper_right_y+height upper_right_y+height],'LineWidth', 3, 'Color','red');
+    line([upper_left_x upper_left_x],[upper_right_y+height upper_left_y],'LineWidth', 3, 'Color','red');
+end
+viscircles(arrLog, arrRad, 'EdgeColor', 'b', 'LineWidth', 1);
+hold off;
+
+end

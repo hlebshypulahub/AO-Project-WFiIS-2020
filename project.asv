@@ -2,7 +2,7 @@ clear; clc;
 
 
 %%% Obraz oryginalny
-origIm = imresize(double(imread('img/done/4.jpg'))/255, [1000 NaN]);
+origIm = imresize(double(imread('img/done/22.jpg'))/255, [1000 NaN]);
 % Im = origIm;
 % figure;
 % % imshow(origIm);
@@ -88,8 +88,7 @@ origIm = imresize(double(imread('img/done/4.jpg'))/255, [1000 NaN]);
 
 
 
-processImage(origIm);
-% imshow(resultImage);
+resultImage = processImage(origIm);
 
 
 
