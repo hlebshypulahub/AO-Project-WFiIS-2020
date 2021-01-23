@@ -90,7 +90,11 @@ for i = 1:size(index, 2)
     line([upper_right_x upper_left_x],[upper_right_y+height upper_right_y+height],'LineWidth', 3, 'Color','red');
     line([upper_left_x upper_left_x],[upper_right_y+height upper_left_y],'LineWidth', 3, 'Color','red');
 end
-viscircles(arrLog, arrRad, 'EdgeColor', 'b', 'LineWidth', 1);
 hold off;
+
+viscircles(arrLog, arrRad, 'EdgeColor', 'b', 'LineWidth', 1);
+
+RGB = insertText(origIm, [100 100], 'Ilość kodł', 'FontSize', 18, 'BoxColor',...
+    'red', 'BoxOpacity', 0.4, 'TextColor', 'white');
 
 end
